@@ -3,39 +3,714 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simple Calculator</title>
-    <link rel="stylesheet" href="style.css">
+    <title>NeuraForge AI - Azure AI Product Development</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            overflow-x: hidden;
+            background: #0a0a0a;
+            color: #ffffff;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #1a1a1a;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(45deg, #00d4ff, #ff00ff);
+            border-radius: 4px;
+        }
+
+        /* Animated Background */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            background: linear-gradient(45deg, #00d4ff, #ff00ff, #00ff88);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: float 20s infinite linear;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* Header */
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 20px 5%;
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(20px);
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: 'Orbitron', monospace;
+            font-size: 2rem;
+            font-weight: 900;
+            background: linear-gradient(45deg, #00d4ff, #ff00ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: #ffffff;
+            text-decoration: none;
+            font-weight: 500;
+            position: relative;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(45deg, #00d4ff, #ff00ff);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .nav-links a:hover {
+            color: #00d4ff;
+        }
+
+        .cta-btn {
+            padding: 12px 30px;
+            background: linear-gradient(45deg, #00d4ff, #ff00ff);
+            border: none;
+            border-radius: 50px;
+            color: #000;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .cta-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 212, 255, 0.4);
+        }
+
+        /* Hero Section */
+        .hero {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            position: relative;
+        }
+
+        .hero-content h1 {
+            font-family: 'Orbitron', monospace;
+            font-size: clamp(3rem, 8vw, 6rem);
+            font-weight: 900;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, #00d4ff, #ff00ff, #00ff88);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from {
+                filter: drop-shadow(0 0 20px #00d4ff);
+            }
+            to {
+                filter: drop-shadow(0 0 30px #ff00ff);
+            }
+        }
+
+        .hero-content p {
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .hero-buttons .btn-secondary {
+            background: transparent;
+            color: #ffffff;
+            border: 2px solid #00d4ff;
+        }
+
+        .hero-buttons .btn-secondary:hover {
+            background: #00d4ff;
+            color: #000;
+        }
+
+        /* Floating Elements */
+        .floating-elements {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .float-item {
+            position: absolute;
+            animation: float3d 25s infinite linear;
+        }
+
+        .float-item:nth-child(1) {
+            top: 20%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+
+        .float-item:nth-child(2) {
+            top: 60%;
+            right: 15%;
+            animation-delay: 5s;
+        }
+
+        .float-item:nth-child(3) {
+            bottom: 20%;
+            left: 20%;
+            animation-delay: 10s;
+        }
+
+        @keyframes float3d {
+            0% {
+                transform: translateY(0px) rotateX(0deg) rotateY(0deg);
+            }
+            50% {
+                transform: translateY(-20px) rotateX(180deg) rotateY(180deg);
+            }
+            100% {
+                transform: translateY(0px) rotateX(360deg) rotateY(360deg);
+            }
+        }
+
+        /* Sections */
+        section {
+            padding: 100px 5%;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 3rem;
+            text-align: center;
+            margin-bottom: 4rem;
+            background: linear-gradient(45deg, #00d4ff, #ff00ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Services Grid */
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+        }
+
+        .service-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            border-radius: 20px;
+            padding: 2.5rem;
+            text-align: center;
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .service-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 212, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .service-card:hover::before {
+            left: 100%;
+        }
+
+        .service-card:hover {
+            transform: translateY(-20px) scale(1.05);
+            border-color: #00d4ff;
+            box-shadow: 0 30px 60px rgba(0, 212, 255, 0.3);
+        }
+
+        .service-icon {
+            font-size: 4rem;
+            background: linear-gradient(45deg, #00d4ff, #ff00ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Stats */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            text-align: center;
+            margin-top: 4rem;
+        }
+
+        .stat-item h3 {
+            font-family: 'Orbitron', monospace;
+            font-size: 3.5rem;
+            background: linear-gradient(45deg, #00d4ff, #ff00ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Contact Form */
+        .contact-form {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .form-group {
+            position: relative;
+            margin-bottom: 2rem;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 1rem 1rem 1rem 0;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            border-radius: 10px;
+            color: #ffffff;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #00d4ff;
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+        }
+
+        .form-group label {
+            position: absolute;
+            top: 1rem;
+            left: 0;
+            color: #888;
+            transition: all 0.3s ease;
+            pointer-events: none;
+        }
+
+        .form-group input:focus + label,
+        .form-group input:valid + label,
+        .form-group textarea:focus + label,
+        .form-group textarea:valid + label {
+            top: -0.75rem;
+            left: 0.75rem;
+            font-size: 0.85rem;
+            color: #00d4ff;
+            background: #0a0a0a;
+            padding: 0 0.5rem;
+        }
+
+        /* Footer */
+        footer {
+            background: #000;
+            text-align: center;
+            padding: 3rem 5%;
+            border-top: 1px solid rgba(0, 212, 255, 0.3);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .hero-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .services-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Typing Animation */
+        .typing {
+            border-right: 3px solid #00d4ff;
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 50% { border-color: transparent; }
+            51%, 100% { border-color: #00d4ff; }
+        }
+
+        /* Scroll Reveal */
+        .reveal {
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 0.8s ease;
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
 </head>
 <body>
+    <!-- Animated Background -->
+    <div class="bg-animation" id="bgAnimation"></div>
 
-    <div class="calculator">
-        <input type="text" id="display" disabled>
-        <div class="buttons">
-            <button onclick="clearDisplay()" class="col-span-2">C</button>
-            <button onclick="deleteLast()">DEL</button>
-            <button onclick="appendToDisplay('/')" class="operator">/</button>
-            
-            <button onclick="appendToDisplay('7')">7</button>
-            <button onclick="appendToDisplay('8')">8</button>
-            <button onclick="appendToDisplay('9')">9</button>
-            <button onclick="appendToDisplay('*')" class="operator">×</button>
-            
-            <button onclick="appendToDisplay('4')">4</button>
-            <button onclick="appendToDisplay('5')">5</button>
-            <button onclick="appendToDisplay('6')">6</button>
-            <button onclick="appendToDisplay('-')" class="operator">-</button>
-            
-            <button onclick="appendToDisplay('1')">1</button>
-            <button onclick="appendToDisplay('2')">2</button>
-            <button onclick="appendToDisplay('3')">3</button>
-            <button onclick="appendToDisplay('+')" class="operator">+</button>
-            
-            <button onclick="appendToDisplay('0')" class="col-span-2">0</button>
-            <button onclick="appendToDisplay('.')">.</button>
-            <button onclick="calculate()" class="equal">=</button>
+    <!-- Header -->
+    <header id="header">
+        <nav>
+            <div class="logo">NeuraForge AI</div>
+            <ul class="nav-links">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#services">Services</a></li>
+                <li><a href="#about">About</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+            <a href="#contact" class="cta-btn">Get Quote</a>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="floating-elements">
+            <i class="fas fa-brain float-item" style="font-size: 3rem; color: #00d4ff;"></i>
+            <i class="fas fa-cloud float-item" style="font-size: 2.5rem; color: #ff00ff;"></i>
+            <i class="fas fa-robot float-item" style="font-size: 3.5rem; color: #00ff88;"></i>
         </div>
-    </div>
+        <div class="hero-content reveal">
+            <h1>Azure AI Excellence</h1>
+            <p class="typing" id="heroText">Building Tomorrow's Intelligence Today with Microsoft Azure AI</p>
+            <div class="hero-buttons">
+                <a href="#services" class="cta-btn">Our Services</a>
+                <a href="#contact" class="cta-btn btn-secondary">Start Project</a>
+            </div>
+        </div>
+    </section>
 
-    <script src="script.js"></script>
+    <!-- Services Section -->
+    <section id="services">
+        <h2 class="section-title reveal">AI Solutions</h2>
+        <div class="services-grid">
+            <div class="service-card reveal">
+                <div class="service-icon">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <h3>Custom AI Models</h3>
+                <p>Develop tailored Azure AI models for computer vision, NLP, and predictive analytics using Azure Machine Learning and Cognitive Services.</p>
+            </div>
+            <div class="service-card reveal">
+                <div class="service-icon">
+                    <i class="fas fa-cloud"></i>
+                </div>
+                <h3>Azure AI Integration</h3>
+                <p>Seamlessly integrate Azure OpenAI, Cognitive Services, and Bot Framework into your existing applications and workflows.</p>
+            </div>
+            <div class="service-card reveal">
+                <div class="service-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <h3>Intelligent Analytics</h3>
+                <p>Harness Azure Synapse Analytics and Power BI with AI capabilities for real-time insights and automated decision-making.</p>
+            </div>
+            <div class="service-card reveal">
+                <div class="service-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h3>AI Security & Compliance</h3>
+                <p>Implement enterprise-grade AI security with Azure Purview, Content Safety, and compliance-ready AI deployments.</p>
+            </div>
+            <div class="service-card reveal">
+                <div class="service-icon">
+                    <i class="fas fa-mobile-alt"></i>
+                </div>
+                <h3>AI Mobile Apps</h3>
+                <p>Create intelligent mobile experiences with Azure AI Vision, Speech Services, and Custom Neural Voice capabilities.</p>
+            </div>
+            <div class="service-card reveal">
+                <div class="service-icon">
+                    <i class="fas fa-cogs"></i>
+                </div>
+                <h3>MLOps Pipeline</h3>
+                <p>Build scalable MLOps pipelines with Azure ML, Kubernetes, and GitHub Actions for continuous AI deployment.</p>
+            </div>
+        </div>
+        <div class="stats">
+            <div class="stat-item reveal">
+                <h3 id="projectsCount">150+</h3>
+                <p>Projects Delivered</p>
+            </div>
+            <div class="stat-item reveal">
+                <h3 id="clientsCount">50+</h3>
+                <p>Happy Clients</p>
+            </div>
+            <div class="stat-item reveal">
+                <h3 id="accuracy">99.8%</h3>
+                <p>Model Accuracy</p>
+            </div>
+            <div class="stat-item reveal">
+                <h3 id="uptime">99.99%</h3>
+                <p>Uptime Guarantee</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" style="background: rgba(0,0,0,0.5);">
+        <h2 class="section-title reveal">Why Choose Us?</h2>
+        <div style="text-align: center; max-width: 800px; margin: 0 auto; line-height: 1.8;">
+            <p style="font-size: 1.3rem; opacity: 0.9; margin-bottom: 2rem;">
+                NeuraForge AI is a premier Azure AI development company specializing in cutting-edge artificial intelligence solutions. 
+                Our team of Microsoft-certified AI engineers delivers enterprise-grade AI products that transform businesses.
+            </p>
+            <div style="display: flex; justify-content: center; gap: 2rem; flex-wrap: wrap;">
+                <div style="text-align: center;">
+                    <i class="fas fa-award" style="font-size: 3rem; color: #00d4ff; margin-bottom: 1rem;"></i>
+                    <h4>Microsoft Partner</h4>
+                </div>
+                <div style="text-align: center;">
+                    <i class="fas fa-users" style="font-size: 3rem; color: #ff00ff; margin-bottom: 1rem;"></i>
+                    <h4>25+ AI Experts</h4>
+                </div>
+                <div style="text-align: center;">
+                    <i class="fas fa-clock" style="font-size: 3rem; color: #00ff88; margin-bottom: 1rem;"></i>
+                    <h4>24/7 Support</h4>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact">
+        <h2 class="section-title reveal">Ready to Transform?</h2>
+        <form action="https://formsubmit.co/kuldip.code@gmail.com" method="POST" class="contact-form reveal">
+            <div class="form-group">
+                <input type="text" id="name" name="name" required>
+                <label for="name">Your Name</label>
+            </div>
+            <div class="form-group">
+                <input type="email" id="email" name="email" required>
+                <label for="email">Email Address</label>
+            </div>
+            <div class="form-group">
+                <input type="text" id="company" name="company">
+                <label for="company">Company</label>
+            </div>
+            <div class="form-group">
+                <textarea id="message" name="message" rows="5" required></textarea>
+                <label for="message">Your Project</label>
+            </div>
+            <button type="submit" class="cta-btn" style="width: 100%; font-size: 1.2rem;">Request Assistance</button>
+        </form>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2024 NeuraForge AI. Powering the Future with Azure Intelligence. <i class="fas fa-rocket"></i></p>
+    </footer>
+
+    <script>
+        // Particle Background Animation
+        function createParticles() {
+            const bg = document.getElementById('bgAnimation');
+            for (let i = 0; i < 50; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDuration = (Math.random() * 20 + 10) + 's';
+                particle.style.animationDelay = Math.random() * 5 + 's';
+                particle.style.width = particle.style.height = (Math.random() * 4 + 1) + 'px';
+                particle.style.opacity = Math.random() * 0.5 + 0.2;
+                bg.appendChild(particle);
+            }
+        }
+
+        // Typing Animation
+        const heroText = "Building Tomorrow's Intelligence Today with Microsoft Azure AI";
+        let i = 0;
+        function typeWriter() {
+            const element = document.getElementById('heroText');
+            if (i < heroText.length) {
+                element.textContent = heroText.slice(0, i + 1);
+                i++;
+                setTimeout(typeWriter, 100);
+            }
+        }
+
+        // Counter Animation
+        function animateCounters() {
+            const counters = {
+                projectsCount: 150,
+                clientsCount: 50,
+                accuracy: 99.8,
+                uptime: 99.99
+            };
+
+            Object.keys(counters).forEach(key => {
+                const element = document.getElementById(key);
+                let current = 0;
+                const increment = counters[key] / 100;
+                const timer = setInterval(() => {
+                    current += increment;
+                    if (current >= counters[key]) {
+                        element.textContent = key === 'accuracy' || key === 'uptime' 
+                            ? counters[key].toFixed(1) + '%' 
+                            : counters[key] + '+';
+                        clearInterval(timer);
+                    } else {
+                        element.textContent = key === 'accuracy' || key === 'uptime' 
+                            ? current.toFixed(1) + '%' 
+                            : Math.ceil(current) + '+';
+                    }
+                }, 30);
+            });
+        }
+
+        // Scroll Reveal Animation
+        function revealOnScroll() {
+            const reveals = document.querySelectorAll('.reveal');
+            reveals.forEach(reveal => {
+                const windowHeight = window.innerHeight;
+                const elementTop = reveal.getBoundingClientRect().top;
+                const elementVisible = 150;
+
+                if (elementTop < windowHeight - elementVisible) {
+                    reveal.classList.add('active');
+                }
+            });
+        }
+
+        // Navbar Scroll Effect
+        window.addEventListener('scroll', () => {
+            const header = document.getElementById('header');
+            if (window.scrollY > 100) {
+                header.style.background = 'rgba(10, 10, 10, 0.98)';
+            } else {
+                header.style.background = 'rgba(10, 10, 10, 0.95)';
+            }
+        });
+
+        // Smooth Scrolling
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            });
+        });
+
+        // Form Submission
+        document.querySelector('.contact-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('Thank you! Your AI project inquiry has been sent. We\'ll contact you within 24 hours.');
+            this.reset();
+        });
+
+        // Intersection Observer for Stats Animation
+        const statsObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    animateCounters();
+                    statsObserver.unobserve(entry.target);
+                }
+            });
+        });
+
+        statsObserver.observe(document.querySelector('.stats'));
+
+        // Initialize
+        window.addEventListener('load', () => {
+            createParticles();
+            setTimeout(typeWriter, 1000);
+            revealOnScroll();
+        });
+
+        window.addEventListener('scroll', revealOnScroll);
+    </script>
 </body>
 </html>
