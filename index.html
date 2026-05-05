@@ -4,6 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NeuraForge AI - Azure AI Product Development</title>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <script type="text/javascript">
+        (function() {
+            // https://dashboard.emailjs.com/admin/account
+            emailjs.init({
+              publicKey: "O-LnZDofYfw2gBKsY",
+            });
+        })();
+    </script>
+    <script type="text/javascript">
+       
+    </script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -565,24 +577,30 @@
     <!-- Contact Section -->
     <section id="contact">
         <h2 class="section-title reveal">Ready to Transform?</h2>
-        <form action="https://formsubmit.co/kuldip.code@gmail.com" method="POST" class="contact-form reveal">
+    
+        <form id="contact-form" class="contact-form reveal">
             <div class="form-group">
-                <input type="text" id="name" name="name" required>
-                <label for="name">Your Name</label>
+            <input type="hidden" name="time" value="">
             </div>
             <div class="form-group">
-                <input type="email" id="email" name="email" required>
-                <label for="email">Email Address</label>
+                <label>Your Name</label>
+                <input type="text" name="name" required>
             </div>
             <div class="form-group">
-                <input type="text" id="company" name="company">
-                <label for="company">Company</label>
+                <label>Your Email</label>
+                <input type="email" name="email" required>
             </div>
             <div class="form-group">
-                <textarea id="message" name="message" rows="5" required></textarea>
-                <label for="message">Your Project</label>
+                <label>Requirement Title</label>
+                <input type="text" name="title" required>
             </div>
-            <button type="submit" class="cta-btn" style="width: 100%; font-size: 1.2rem;">Request Assistance</button>
+            <div class="form-group">
+                <label>Requirement Details</label>
+                <textarea name="message" required></textarea>
+            </div>
+            <div class="form-group">
+                <input type="submit" class="cta-btn" style="width: 100%; font-size: 1.2rem;" value="Send">
+            </div>
         </form>
     </section>
 
@@ -685,11 +703,19 @@
         });
 
         // Form Submission
-        document.querySelector('.contact-form').addEventListener('submit', function(e) {
+        document.getElementById('contact-form').addEventListener('submit', function(e) {
             e.preventDefault();
-            alert('Thank you! Your AI project inquiry has been sent. We\'ll contact you within 24 hours.');
+             emailjs.sendForm('service_xk2l4a3', 'template_v0pxdr9', this)
+                    .then(() => {
+                        console.log('SUCCESS!');
+                        alert('Thank you! Your AI project inquiry has been sent. We\'ll contact you within 24 hours.');
+                    }, (error) => {
+                        console.log('FAILED...', error);
+                    });
+            
             this.reset();
         });
+              
 
         // Intersection Observer for Stats Animation
         const statsObserver = new IntersectionObserver((entries) => {
@@ -711,6 +737,7 @@
         });
 
         window.addEventListener('scroll', revealOnScroll);
+        
     </script>
 </body>
 </html>
